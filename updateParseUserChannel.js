@@ -1,5 +1,6 @@
 /**
  * Class that adds a parse channel to all instalation of an App
+ * Due to the parse request limit you may have to run the script several times to get all instalation to update
  */
 
 //Class Variables
@@ -22,7 +23,7 @@ var logger = new (winston.Logger)({
 /**
  * Initialize Parse with keys
  */
-Parse.initialize("gj2TfaLUgtmIrBNovNrVYCtsGGGJS3UV2RqsPTpe", "lXGNArrpLeY7p9OP0sJZQzU2iLZaSoMF7I1H2cja","FmwsZHYjTcUMqNCcELfw45w5eZaw3fJ8UMhD4urP");
+Parse.initialize("WXYWaxFqpJWUq0Sc1RSF4T5pEcRa9hzd0L5WCdfy", "ViL8y0PTQ8kXXbAJZsHySeuyNluw3GRIe4KOZNZb","lyZ1SyItcofFzyzvg8eCzD5y78lJNJrbsN0dz99k");
 
 //Getting users
 updateInstalations();
@@ -43,33 +44,14 @@ function updateInstalations()
   var channelName = "costarica";
 
   var query = new Parse.Query(Parse.Installation);
-  query.find({
-    success: function(installations) {
-      logger.debug("Successfully retrieved " + installations.length + " instalations.");
+  query.notContainedIn("channels", [channelName]);
 
-      logger.debug("Updating instalation and adding channel of " + channelName);
-      for (var i = 0; i < installations.length; i++){
-        // Add the channel to all the installations for this user
-        installations[i].addUnique("channels", channelName); //Add the channel to the installation
-        changedObjects.push(installations[i]); //Add the installation to be saved later on!
-      }
+  query.each(function(installation) {
+    console.log("Updating instalation: " + installation.id);
 
-      //Saving all the installations
-      Parse.Object.saveAll(changedObjects, {
-        success: function(installations) {
-          //All installation saved
-          logger.debug("Updated all instalations objects");
+    installation.addUnique("channels", channelName); //Add the channel to the installation
 
-        },
-        error: function(error) {
-          // An error occurred while saving one of the objects.
-          logger.error("Error saving installations "+ error);
-        }
-      });
+    installation.save();
 
-    },
-    error: function(error) {
-      logger.error("Error: " + error.code + " " + error.message);
-    }
   });
 }
