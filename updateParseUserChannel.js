@@ -1,6 +1,5 @@
 /**
  * Class that adds a parse channel to all instalation of an App
- * Due to the parse request limit you may have to run the script several times to get all instalation to update
  */
 
 //Class Variables
@@ -22,17 +21,18 @@ var logger = new (winston.Logger)({
 
 /**
  * Initialize Parse with keys
+ * Master key is needed to update Instalation entities
  */
-Parse.initialize("WXYWaxFqpJWUq0Sc1RSF4T5pEcRa9hzd0L5WCdfy", "ViL8y0PTQ8kXXbAJZsHySeuyNluw3GRIe4KOZNZb","lyZ1SyItcofFzyzvg8eCzD5y78lJNJrbsN0dz99k");
+Parse.initialize("$PARSE_APPLICATION_ID", "$PARSE_JAVASCRIPT_KEY", "PARSE_MASTER_KEY");
 
 //Getting users
-updateInstalations();
+updateInstalationsWithChannel();
 
 /**
  * Update instalations
  * @return void
  */
-function updateInstalations()
+function updateInstalationsWithChannel()
 {
   logger.debug('Connecting to parse');
 
@@ -41,7 +41,7 @@ function updateInstalations()
   Parse.Cloud.useMasterKey();
 
   var changedObjects = [];
-  var channelName = "costarica";
+  var channelName = "yourchannelname";
 
   var query = new Parse.Query(Parse.Installation);
   query.notContainedIn("channels", [channelName]);
